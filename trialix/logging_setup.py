@@ -39,6 +39,7 @@ def setup_logging(output_dir, debug=False):
         Output directory where logs/ will be created.
     debug : bool
         If True, set console log level to DEBUG. Otherwise INFO.
+        Also controls verbosity of third-party libraries (nilearn, etc).
 
     Returns
     -------
@@ -78,6 +79,12 @@ def setup_logging(output_dir, debug=False):
     )
     file_handler.setFormatter(file_fmt)
     logger.addHandler(file_handler)
+
+    # Suppress verbose logging from third-party libraries unless in debug mode
+    if not debug:
+        logging.getLogger("nilearn").setLevel(logging.WARNING)
+        logging.getLogger("nibabel").setLevel(logging.WARNING)
+        logging.getLogger("sklearn").setLevel(logging.WARNING)
 
     logger.info(f"Trialix log file: {log_file}")
     return logger
