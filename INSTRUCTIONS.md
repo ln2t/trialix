@@ -28,7 +28,7 @@ The *events.tsv file plays a crucial role in trialix as it defines essentially w
   As per fMRIPrep documentation, the data are organised as follows (in PREPROC_PATH):
 
   sub-SUB/[ses-SES/]func/sub-SUB_[ses-SES_]task-TASK_space-SPACE_desc-preproc_bold.nii.gz  # preprocessed fmri data to use
-  sub-SUB/[ses-SES/]func/sub-SUB_[ses-SES_]task-TASK_desc-confounds_timeseries.nii.gz      # confounds file from which regressors will be taken
+  sub-SUB/[ses-SES/]func/sub-SUB_[ses-SES_]task-TASK_desc-confounds_timeseries.tsv        # confounds file from which regressors will be taken
 
   B. BIDS filtering:
     1. --participant-label SUB1 [SUB2 ...]: set the participant label (single or list). Example: --participant-label 042 001. Default: all subjets in dataset (as found by .get_subjects(); check that manually provided subjects exist). CLI and config allowed.
