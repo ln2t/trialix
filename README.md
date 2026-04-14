@@ -1,93 +1,276 @@
-# trialix
+# Trialix
 
+**First-level fMRI analysis for trial-based experimental designs.**
 
+Trialix is a BIDS-application CLI tool that performs participant-level (first-level) fMRI analysis using [nilearn](https://nilearn.github.io/). It is designed for trial-based experimental conditions — block designs, event-related designs, or mixed designs.
 
-## Getting started
+Trialix is a wrapper around nilearn's `FirstLevelModel` that handles BIDS data discovery, GLM fitting, contrast computation, statistical thresholding, and BIDS-compliant output generation.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+> **Note:** Trialix does **not** perform fMRI preprocessing. It expects data preprocessed by [fMRIPrep](https://fmriprep.org/) or a similar tool. Group-level (second-level) analysis is handled by the companion tool **StatCraft**.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.ulb.be/ln2t/trialix.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-* [Set up project integrations](https://gitlab.ulb.be/ln2t/trialix/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+
+```bash
+# Clone the repository
+git clone https://github.com/arovai/trialix.git
+cd trialix
+
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install trialix and its dependencies
+pip install -e .
+```
+
+### Dependencies
+
+- Python ≥ 3.9
+- [nilearn](https://nilearn.github.io/) ≥ 0.10
+- [pybids](https://bids-standard.github.io/pybids/) ≥ 0.16
+- [nibabel](https://nipy.org/nibabel/) ≥ 4.0
+- numpy, pandas, pyyaml, matplotlib
+
+---
+
+## Quick Start
+
+### Basic usage (BIDS rawdata + fMRIPrep derivatives)
+
+```bash
+trialix /data/rawdata /data/output participant \
+    --task motor \
+    --derivatives preproc=/data/derivatives/fmriprep
+```
+
+### Full analysis with contrasts and thresholding
+
+```bash
+trialix /data/rawdata /data/output participant \
+    --task motor \
+    --derivatives preproc=/data/derivatives/fmriprep \
+    --participant-label 01 02 03 \
+    --conditions left_hand right_hand \
+    --regressors trans_x trans_y trans_z rot_x rot_y rot_z \
+    --contrasts "left_hand - right_hand" "left_hand + right_hand" \
+    --alpha 0.05 0.001 \
+    --height-control fdr bonferroni
+```
+
+### Using a config file
+
+```bash
+trialix /data/rawdata /data/output participant --config config.yaml
+```
+
+CLI arguments always override config file values.
+
+---
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```
+trialix INPUT_DIR OUTPUT_DIR participant [options]
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Positional Arguments
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+| Argument | Description |
+|---|---|
+| `INPUT_DIR` | Path to BIDS rawdata folder (with `--derivatives`) or to preprocessed data folder (with `--events-file`). |
+| `OUTPUT_DIR` | Path to output directory for analysis derivatives. |
+| `participant` | Analysis level (currently only `participant` is supported). |
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+### Input Modes
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+**Mode 1: BIDS rawdata + derivatives**
+- `INPUT_DIR` points to the BIDS rawdata folder
+- Use `--derivatives preproc=PATH` to specify fMRIPrep output
+- Events files are discovered automatically from rawdata
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+**Mode 2: Preprocessed data directly**
+- `INPUT_DIR` points to the preprocessed data folder (e.g., fMRIPrep output)
+- Use `--events-file PATH` to provide the events TSV file
+
+### General Options
+
+| Option | Description |
+|---|---|
+| `--help` | Show help message and exit. |
+| `--version` | Show version and exit. |
+| `--debug` | Enable debug mode with increased verbosity. |
+| `--config FILE` | Path to YAML configuration file. |
+
+### Derivatives
+
+| Option | Description |
+|---|---|
+| `--derivatives KEY=PATH` | Specify BIDS derivatives location. Use `preproc=PATH` for preprocessed data. Can be specified multiple times. |
+
+### BIDS Entity Filters
+
+| Option | Default | Description |
+|---|---|---|
+| `--participant-label LABEL [LABEL ...]` | all | Subjects to process (without `sub-` prefix). |
+| `--task TASK` | *required* | Task to process (without `task-` prefix). |
+| `--session SESSION` | None | Session to process (without `ses-` prefix). |
+| `--space SPACE` | `MNI152NLin2009cAsym` | Template space. |
+
+### Modeling Options
+
+| Option | Default | Description |
+|---|---|---|
+| `--events-file PATH` | auto | Path to events TSV file. Required in Mode 2. |
+| `--confounds-file PATH` | auto | Custom confounds TSV file. Default: fMRIPrep output. |
+| `--conditions COND [COND ...]` | all | Trial types to include from events.tsv. |
+| `--regressors REG [REG ...]` | none | Confound regressors (column names from confounds file). |
+| `--contrasts CON [CON ...]` | auto | Contrast definitions (e.g., `"cond1 - cond2"`). |
+
+### Statistical Thresholding
+
+| Option | Default | Description |
+|---|---|---|
+| `--alpha ALPHA [ALPHA ...]` | `0.05` | P-value threshold(s). |
+| `--height-control METHOD [METHOD ...]` | none | Correction method: `fdr`, `bonferroni`, or `none`. |
+
+### Config-File-Only Parameters
+
+These parameters can only be set in the YAML configuration file and are passed directly to nilearn's `FirstLevelModel`:
+
+| Parameter | Default | Description |
+|---|---|---|
+| `hrf_model` | `glover` | HRF model (`glover`, `spm`, `glover + derivative`, etc.) |
+| `drift_model` | `cosine` | Drift model (`cosine`, `polynomial`, or `null`) |
+| `drift_order` | `1` | Drift order for polynomial model |
+| `high_pass` | `0.01` | High-pass filter cutoff in Hz |
+| `smoothing_fwhm` | `null` | Spatial smoothing FWHM in mm |
+
+---
+
+## Configuration File
+
+Trialix supports a YAML configuration file. CLI arguments override config values. See [`config_example.yaml`](config_example.yaml) for a complete example.
+
+```yaml
+# Required
+task: motor
+
+# Optional BIDS filters
+participant_label:
+  - "01"
+  - "02"
+space: MNI152NLin2009cAsym
+
+# Modeling
+conditions:
+  - left_hand
+  - right_hand
+regressors:
+  - trans_x
+  - trans_y
+  - trans_z
+contrasts:
+  - "left_hand - right_hand"
+
+# Thresholding
+alpha:
+  - 0.05
+height_control:
+  - fdr
+
+# FirstLevelModel parameters (config-only)
+hrf_model: glover
+drift_model: cosine
+high_pass: 0.01
+smoothing_fwhm: 6
+```
+
+---
+
+## Workflow
+
+1. **Validate inputs** — Check CLI arguments and config file; verify data paths.
+2. **Discover data** — Use pybids to find subjects, tasks, sessions, BOLD files, events, and confounds.
+3. **Loop over subjects and sessions:**
+   - Load preprocessed BOLD data
+   - Load events TSV (filter by requested conditions)
+   - Load confounds TSV (select requested regressors)
+   - Extract TR from BIDS metadata or NIfTI header
+   - Build `FirstLevelModel` with specified parameters
+   - Fit the GLM
+   - Compute contrasts (z-score, t-stat, p-value, effect size, effect variance)
+   - Apply statistical thresholding
+   - Save BIDS-compliant NIfTI outputs
+   - Generate and save HTML report
+4. **Write `dataset_description.json`** in output directory.
+
+---
+
+## Output Structure
+
+```
+OUTPUT_DIR/
+├── dataset_description.json
+├── logs/
+│   └── trialix_YYYYMMDD_HHMMSS.log
+├── sub-01/
+│   ├── [ses-SES/]
+│   │   ├── sub-01_[ses-SES_]task-TASK_space-SPACE_contrast-CON_desc-zScore_statmap.nii.gz
+│   │   ├── sub-01_[ses-SES_]task-TASK_space-SPACE_contrast-CON_desc-tStat_statmap.nii.gz
+│   │   ├── sub-01_[ses-SES_]task-TASK_space-SPACE_contrast-CON_desc-pValue_statmap.nii.gz
+│   │   ├── sub-01_[ses-SES_]task-TASK_space-SPACE_contrast-CON_desc-effectSize_statmap.nii.gz
+│   │   ├── sub-01_[ses-SES_]task-TASK_space-SPACE_contrast-CON_desc-effectVariance_statmap.nii.gz
+│   │   ├── sub-01_[ses-SES_]task-TASK_space-SPACE_contrast-CON_desc-zScoreThresh*_statmap.nii.gz
+│   │   └── sub-01_[ses-SES_]task-TASK_space-SPACE_report.html
+│   └── ...
+├── sub-02/
+│   └── ...
+└── ...
+```
+
+---
+
+## Events File Format
+
+The events TSV file must contain at least three columns:
+
+| Column | Type | Description |
+|---|---|---|
+| `onset` | float | Event onset time in seconds |
+| `duration` | float | Event duration in seconds |
+| `trial_type` | string | Condition label |
+
+Example:
+
+```tsv
+onset	duration	trial_type
+0.0	15.0	left_hand
+20.0	15.0	right_hand
+40.0	15.0	left_hand
+60.0	15.0	right_hand
+```
+
+---
+
+## Expected fMRIPrep Output Structure
+
+Trialix expects fMRIPrep output organized as:
+
+```
+PREPROC_PATH/
+├── sub-SUB/
+│   ├── [ses-SES/]
+│   │   └── func/
+│   │       ├── sub-SUB_[ses-SES_]task-TASK_space-SPACE_desc-preproc_bold.nii.gz
+│   │       └── sub-SUB_[ses-SES_]task-TASK_desc-confounds_timeseries.tsv
+│   └── ...
+└── ...
+```
+
+---
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT
