@@ -201,6 +201,7 @@ def find_events_file(raw_layout, subject, task, session=None):
     events_path : str
         Path to the events TSV file.
     """
+    # First try subject-specific events file (sub-XX/func/*_events.tsv)
     filters = dict(
         subject=subject,
         task=task,
@@ -213,11 +214,32 @@ def find_events_file(raw_layout, subject, task, session=None):
 
     files = raw_layout.get(**filters)
 
+    # Fallback: dataset-level events file (task-TASK_events.tsv at root)
+    if not files:
+        logger.debug(
+            f"No subject-specific events file for sub-{subject}, "
+            f"trying dataset-level events file."
+        )
+        root_filters = dict(
+            task=task,
+            suffix='events',
+            extension='.tsv',
+            return_type='file',
+        )
+        if session:
+            root_filters['session'] = session
+        all_events = raw_layout.get(**root_filters)
+        # Keep only files without a subject entity (dataset-level)
+        files = [
+            f for f in all_events
+            if 'sub-' not in Path(f).name
+        ]
+
     if not files:
         ses_str = f" ses-{session}" if session else ""
         raise FileNotFoundError(
             f"No events file found for sub-{subject}{ses_str} task-{task} "
-            f"in rawdata."
+            f"in rawdata (checked both subject-level and dataset-level)."
         )
 
     if len(files) > 1:
