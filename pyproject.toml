@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trialix"
+version = "0.1.0"
+description = "BIDS-based first-level fMRI analysis tool for trial-based designs"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = [
+    "nilearn>=0.10",
+    "pybids>=0.16",
+    "nibabel>=4.0",
+    "numpy",
+    "pandas",
+    "pyyaml",
+    "matplotlib",
+]
+
+[project.scripts]
+trialix = "trialix.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["trialix*"]

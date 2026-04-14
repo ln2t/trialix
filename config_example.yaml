@@ -1,0 +1,69 @@
+# Trialix configuration file example
+# CLI arguments override these values when both are specified.
+
+# ─── BIDS Filtering ──────────────────────────────────────────────────────────
+# Task label (required, without 'task-' prefix)
+task: motor
+
+# Participant labels (without 'sub-' prefix). Default: all subjects.
+# participant_label:
+#   - "01"
+#   - "02"
+
+# Session label (without 'ses-' prefix). Default: all sessions (or None).
+# session: "pre"
+
+# Template space. Default: MNI152NLin2009cAsym
+space: MNI152NLin2009cAsym
+
+# ─── Modeling ─────────────────────────────────────────────────────────────────
+# Trial types to include in the model (from events.tsv trial_type column).
+# Default: all trial types.
+# conditions:
+#   - left_hand
+#   - right_hand
+
+# Confound regressors to include (column names from confounds.tsv).
+# Default: none.
+# regressors:
+#   - trans_x
+#   - trans_y
+#   - trans_z
+#   - rot_x
+#   - rot_y
+#   - rot_z
+
+# Contrast definitions (strings passed to nilearn's compute_contrast).
+# Default: one identity contrast per condition.
+# contrasts:
+#   - "left_hand - right_hand"
+#   - "left_hand + right_hand"
+
+# ─── Statistical Thresholding ─────────────────────────────────────────────────
+# P-value thresholds
+alpha:
+  - 0.05
+
+# Multiple comparison correction: 'fdr', 'bonferroni', or 'none'
+# Paired element-wise with alpha values.
+# height_control:
+#   - fdr
+
+# ─── FirstLevelModel Parameters (config-file only) ───────────────────────────
+# These are passed directly to nilearn's FirstLevelModel constructor.
+# See: https://nilearn.github.io/stable/modules/generated/nilearn.glm.first_level.FirstLevelModel.html
+
+# HRF model: 'glover', 'spm', 'glover + derivative', etc.
+hrf_model: glover
+
+# Drift model: 'cosine', 'polynomial', or null
+drift_model: cosine
+
+# Drift order (for polynomial drift model)
+drift_order: 1
+
+# High-pass filter cutoff in Hz (used with cosine drift model)
+high_pass: 0.01
+
+# Spatial smoothing FWHM in mm. null = no smoothing.
+smoothing_fwhm: null
