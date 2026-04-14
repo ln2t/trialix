@@ -1,6 +1,14 @@
+<div align="center">
+
 # Trialix
 
-**First-level fMRI analysis for trial-based experimental designs.**
+**First-level fMRI analysis for trial-based experimental designs**
+
+[Installation](#installation) | [Quick Start](#quick-start) | [Usage](#usage) | [Configuration](#configuration) | [Workflow](#workflow) | [Output Structure](#output-structure) | [Events File Format](#events-file-format) | [Expected fMRIPrep Output Structure](#expected-fmriprep-output-structure) | [License](#license)
+
+</div>
+
+---
 
 Trialix is a BIDS-application CLI tool that performs participant-level (first-level) fMRI analysis using [nilearn](https://nilearn.github.io/). It is designed for trial-based experimental conditions — block designs, event-related designs, or mixed designs.
 
@@ -149,7 +157,7 @@ These parameters can only be set in the YAML configuration file and are passed d
 
 ---
 
-## Configuration File
+## Configuration
 
 Trialix supports a YAML configuration file. CLI arguments override config values. See [`config_example.yaml`](config_example.yaml) for a complete example.
 
