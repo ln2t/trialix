@@ -6,6 +6,28 @@ from datetime import datetime
 from pathlib import Path
 
 
+class _ThirdPartyFilter(logging.Filter):
+    """Filter to suppress verbose logging from third-party libraries in non-debug mode."""
+    
+    def __init__(self, debug=False):
+        super().__init__()
+        self.debug = debug
+        # Third-party library logger prefixes to suppress at INFO/DEBUG level
+        self.third_party_prefixes = ('nilearn', 'nibabel', 'sklearn')
+    
+    def filter(self, record):
+        """Allow record if: debug mode, or not from third-party, or third-party is WARNING+."""
+        if self.debug:
+            return True
+        
+        # Check if this log record is from a third-party library
+        if any(record.name.startswith(prefix) for prefix in self.third_party_prefixes):
+            # Only allow WARNING level and above from third-party libraries
+            return record.levelno >= logging.WARNING
+        
+        return True
+
+
 class _ColoredFormatter(logging.Formatter):
     """Logging formatter with colored level names."""
 
@@ -54,11 +76,14 @@ def setup_logging(output_dir, debug=False):
 
     log_level = logging.DEBUG if debug else logging.INFO
 
-    # Root trialix logger
-    logger = logging.getLogger("trialix")
-    logger.setLevel(logging.DEBUG)
-    # Clear any existing handlers (avoid duplicates on re-init)
-    logger.handlers.clear()
+    # Configure root logger to capture all messages
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)  # Root accepts all, handlers filter
+    # Clear any existing handlers to avoid duplicates
+    root_logger.handlers.clear()
+
+    # Create filter for third-party logging
+    third_party_filter = _ThirdPartyFilter(debug=debug)
 
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
@@ -68,7 +93,9 @@ def setup_logging(output_dir, debug=False):
         datefmt="%H:%M:%S",
     )
     console_handler.setFormatter(console_fmt)
-    logger.addHandler(console_handler)
+    # Add filter to suppress verbose third-party logging
+    console_handler.addFilter(third_party_filter)
+    root_logger.addHandler(console_handler)
 
     # File handler (always DEBUG level for full trace)
     file_handler = logging.FileHandler(log_file)
@@ -78,13 +105,9 @@ def setup_logging(output_dir, debug=False):
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     file_handler.setFormatter(file_fmt)
-    logger.addHandler(file_handler)
+    root_logger.addHandler(file_handler)
 
-    # Suppress verbose logging from third-party libraries unless in debug mode
-    if not debug:
-        logging.getLogger("nilearn").setLevel(logging.WARNING)
-        logging.getLogger("nibabel").setLevel(logging.WARNING)
-        logging.getLogger("sklearn").setLevel(logging.WARNING)
-
+    # Get trialix logger for convenience
+    logger = logging.getLogger("trialix")
     logger.info(f"Trialix log file: {log_file}")
     return logger
