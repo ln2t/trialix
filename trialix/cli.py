@@ -48,8 +48,8 @@ def create_parser() -> argparse.ArgumentParser:
 
     description = textwrap.dedent(f"""
     {Colors.BOLD}{Colors.GREEN}╔══════════════════════════════════════════════════════════════════════════════╗
-    ║                          TRIALIX v{__version__}                                      ║
-    ║           First-Level fMRI Analysis for Trial-Based Designs                  ║
+    ║                          TRIALIX v{__version__}                                     ║
+    ║           First-Level fMRI Analysis for Trial-Based Designs                 ║
     ╚══════════════════════════════════════════════════════════════════════════════╝{Colors.END}
 
     {Colors.BOLD}Description:{Colors.END}
