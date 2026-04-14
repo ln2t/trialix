@@ -33,7 +33,8 @@ def build_first_level_model(t_r, subject_label=None, model_params=None,
     if model_params is None:
         model_params = {}
 
-    verbose = 2 if debug else 1
+    # Set verbose level: 0=silent, 1=warnings, 2=info (only used for debug)
+    verbose = 2 if debug else 0
 
     flm = FirstLevelModel(
         t_r=t_r,
