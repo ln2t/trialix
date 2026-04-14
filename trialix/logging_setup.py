@@ -6,6 +6,27 @@ from datetime import datetime
 from pathlib import Path
 
 
+class _ColoredFormatter(logging.Formatter):
+    """Logging formatter with colored level names."""
+
+    COLORS = {
+        'DEBUG': '\033[36m',      # Cyan
+        'INFO': '\033[92m',       # Green
+        'WARNING': '\033[93m',    # Yellow
+        'ERROR': '\033[91m',      # Red
+        'CRITICAL': '\033[95m',   # Magenta
+    }
+    RESET = '\033[0m'
+
+    def format(self, record):
+        levelname = record.levelname
+        if levelname in self.COLORS:
+            record.levelname = (
+                f"{self.COLORS[levelname]}{levelname}{self.RESET}"
+            )
+        return super().format(record)
+
+
 def setup_logging(output_dir, debug=False):
     """
     Configure logging to both console (stdout) and log file.
@@ -41,7 +62,7 @@ def setup_logging(output_dir, debug=False):
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(log_level)
-    console_fmt = logging.Formatter(
+    console_fmt = _ColoredFormatter(
         "%(asctime)s | %(levelname)-8s | %(message)s",
         datefmt="%H:%M:%S",
     )
