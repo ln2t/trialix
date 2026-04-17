@@ -399,7 +399,8 @@ def _process_subject_session(config, raw_layout, preproc_layout, is_raw,
     # I. Generate and save report
     # ------------------------------------------------------------------
     try:
-        report = generate_report(flm, contrasts)
+        alpha, hc = threshold_pairs[0] if threshold_pairs else (0.001, 'fpr')
+        report = generate_report(flm, contrasts, alpha=alpha, height_control=hc)
         save_report(report, output_dir, subject, session, task, space)
     except Exception as e:
         logger.warning(f"Report generation failed: {e}")
