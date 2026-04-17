@@ -158,7 +158,7 @@ def threshold_contrast_map(z_map, alpha=0.05, height_control=None):
     return thresholded_map, threshold_value
 
 
-def generate_report(flm, contrasts):
+def generate_report(flm, contrasts, alpha=0.001, height_control='fpr'):
     """
     Generate an HTML report for the fitted model.
 
@@ -168,6 +168,10 @@ def generate_report(flm, contrasts):
         Fitted model.
     contrasts : list of str
         Contrast definitions to include in the report.
+    alpha : float
+        Significance level for thresholding.
+    height_control : str or None
+        False-positive control method ('fpr', 'fdr', 'bonferroni', or None).
 
     Returns
     -------
@@ -175,7 +179,13 @@ def generate_report(flm, contrasts):
         Nilearn HTML report object.
     """
     logger.info("Generating HTML report...")
-    report = flm.generate_report(contrasts=contrasts, two_sided=True, plot_type='glass')
+    report = flm.generate_report(
+        contrasts=contrasts,
+        alpha=alpha,
+        height_control=height_control,
+        two_sided=True,
+        plot_type='glass',
+    )
     logger.info("Report generation complete.")
     return report
 

@@ -10,9 +10,9 @@
 
 ---
 
-Trialix is a BIDS-application CLI tool that performs participant-level (first-level) fMRI analysis using [nilearn](https://nilearn.github.io/). It is designed for trial-based experimental conditions — block designs, event-related designs, or mixed designs.
+Trialix is a BIDS-application CLI tool that performs participant-level (first-level) fMRI analysis for trial-based experimental conditions — block designs, event-related designs, or mixed designs.
 
-Trialix is a wrapper around nilearn's `FirstLevelModel` that handles BIDS data discovery, GLM fitting, contrast computation, statistical thresholding, and BIDS-compliant output generation.
+At its core, Trialix is a BIDS wrapper for [nilearn](https://nilearn.github.io/). All core statistical routines — GLM fitting, contrast computation, and statistical thresholding — rely on nilearn's well-proven implementations, in particular [`FirstLevelModel`](https://nilearn.github.io/stable/modules/generated/nilearn.glm.first_level.FirstLevelModel.html). Trialix adds a BIDS-aware layer on top, handling data discovery, confound selection, and BIDS-compliant output generation so that users can run first-level analyses directly from fMRIPrep derivatives with minimal boilerplate.
 
 > **Note:** Trialix does **not** perform fMRI preprocessing. It expects data preprocessed by [fMRIPrep](https://fmriprep.org/) or a similar tool. Group-level (second-level) analysis is handled by the companion tool **StatCraft**.
 
@@ -276,6 +276,14 @@ PREPROC_PATH/
 │   └── ...
 └── ...
 ```
+
+---
+
+## Acknowledgments
+
+Trialix is built on top of [nilearn](https://nilearn.github.io/), which provides the core neuroimaging statistical routines used throughout this tool. We gratefully acknowledge the nilearn developers and community for their work in making high-quality, well-tested fMRI analysis methods accessible in Python.
+
+Trialix also relies on [pybids](https://bids-standard.github.io/pybids/) for BIDS dataset querying, [nibabel](https://nipy.org/nibabel/) for neuroimaging file I/O, and [fMRIPrep](https://fmriprep.org/) as the expected preprocessing pipeline.
 
 ---
 
