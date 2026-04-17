@@ -175,7 +175,7 @@ def generate_report(flm, contrasts):
         Nilearn HTML report object.
     """
     logger.info("Generating HTML report...")
-    report = flm.generate_report(contrasts=contrasts)
+    report = flm.generate_report(contrasts=contrasts, two_sided=True, plot_type='glass')
     logger.info("Report generation complete.")
     return report
 
