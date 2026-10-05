@@ -96,7 +96,7 @@ def validate_task(layout, task):
     logger.debug(f"Task '{task}' validated (available: {available_tasks})")
 
 
-def get_sessions(layout, session=None):
+def get_sessions(layout, session=None, subject=None):
     """
     Get list of sessions to process.
 
@@ -106,19 +106,30 @@ def get_sessions(layout, session=None):
         BIDS layout for session discovery.
     session : str or None
         Specific session to process. None means all sessions.
+    subject : str or None
+        Restrict session discovery to this subject.
 
     Returns
     -------
     sessions : list of str or [None]
-        Session labels, or [None] if dataset has no sessions.
+        Session labels, or [None] if the subject/dataset has no sessions.
     """
-    available = layout.get_sessions()
+    if subject is not None:
+        available = layout.get_sessions(subject=subject)
+    else:
+        available = layout.get_sessions()
 
     if not available:
         return [None]
 
     if session is not None:
         if session not in available:
+            if subject is not None:
+                logger.warning(
+                    f"Session '{session}' not found for sub-{subject}; "
+                    f"available: {available}"
+                )
+                return []
             raise ValueError(
                 f"Session '{session}' not found. "
                 f"Available sessions: {available}"

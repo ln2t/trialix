@@ -164,11 +164,15 @@ def run_pipeline(args):
     )
     log.info(f"Subjects to process: {subjects}")
 
-    sessions = get_sessions(
-        discovery_layout,
-        session=config.get('session'),
-    )
-    log.info(f"Sessions to process: {sessions}")
+    subject_sessions = {
+        sub: get_sessions(
+            discovery_layout,
+            session=config.get('session'),
+            subject=sub,
+        )
+        for sub in subjects
+    }
+    log.info(f"Sessions to process: {subject_sessions}")
 
     # ------------------------------------------------------------------
     # 4. Write dataset_description.json
@@ -197,12 +201,12 @@ def run_pipeline(args):
     # ------------------------------------------------------------------
     # 7. Main processing loop
     # ------------------------------------------------------------------
-    n_total = len(subjects) * len(sessions)
+    n_total = sum(len(s) for s in subject_sessions.values())
     n_done = 0
     n_failed = 0
 
     for subject in subjects:
-        for session in sessions:
+        for session in subject_sessions[subject]:
             n_done += 1
             ses_str = f" ses-{session}" if session else ""
             log.info("")
